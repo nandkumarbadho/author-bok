@@ -5,12 +5,13 @@ import { useQuery, gql } from '@apollo/client';
 import { GET_ALL_AUTHORS, GET_ALL_BOOKS } from '../schemas/query';
 import Author from '../components/Author';
 import Book from '../components/Book';
+import Loader from '../components/Loader';
 
 const Books = () => {
 
     const { loading, error, data } = useQuery(GET_ALL_BOOKS);
 
-    if (loading) return <Text>Loading...</Text>;
+    if (loading) return <Loader />;
     if (error) {
         console.log(error)
         return <Text>Error :</Text>;

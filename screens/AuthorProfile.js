@@ -1,28 +1,27 @@
-import { View, Text, StyleSheet, Platform, SafeAreaView, Image, TouchableOpacity, FlatList } from 'react-native'
+import { View, Text, StyleSheet, Platform, SafeAreaView, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { GET_DETAILS_OF_AUTHOR } from '../schemas/query';
 import { useQuery } from '@apollo/client';
 import Book from '../components/Book';
+import Loader from '../components/Loader';
 
 const AuthorProfile = ({ route }) => {
     const navigation = useNavigation();
     const { id } = route.params;
     console.log(id);
-    // const { loading, error, data } = useQuery(GET_DETAILS_OF_AUTHOR(JSON.stringify(id)));
     const { loading, error, data } = useQuery(GET_DETAILS_OF_AUTHOR, {
         variables: {
             id: id
         }
     })
 
-    if (loading) return <Text>Loading...</Text>;
+    if (loading) return <Loader />;
     if (error) {
         console.log(error)
         return <Text>Error :</Text>;
     }
-    console.log(data)
     return (
         <SafeAreaView style={styles.AndroidSafeArea}>
             <View style={styles.container}>
@@ -44,12 +43,6 @@ const AuthorProfile = ({ route }) => {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <View
-                    style={{
-                        borderBottomColor: 'black',
-                        borderBottomWidth: StyleSheet.hairlineWidth,
-                    }}
-                />
                 <View style={styles.booksContainer}>
                     <FlatList
                         showsVerticalScrollIndicator={false}

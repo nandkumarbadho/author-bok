@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { useNavigation } from '@react-navigation/native'
-
+const BOOK_IMAGE_URL = "https://cdn4.iconfinder.com/data/icons/bookstore-9/64/woman-girl-avatar-reading-student-education-book_store-512.png"
 const Book = ({ book }) => {
     const navigation = useNavigation();
     return (
@@ -13,7 +13,7 @@ const Book = ({ book }) => {
             }}
         >
             <View style={styles.sectionCard} key={book?.id}>
-                <Image style={styles.sectionImage} source={{ uri: "https://cdn4.iconfinder.com/data/icons/bookstore-9/64/woman-girl-avatar-reading-student-education-book_store-512.png" }} />
+                <Image style={styles.sectionImage} source={{ uri: BOOK_IMAGE_URL }} />
                 <View style={styles.sectionInfo}>
                     <Text style={styles.sectionLabel}>{book?.name}</Text>
                 </View>

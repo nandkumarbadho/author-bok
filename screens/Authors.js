@@ -1,15 +1,17 @@
 import React from 'react';
-import { FlatList, Platform, Pressable, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, FlatList, Platform, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import { View, StyleSheet, Text } from 'react-native';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { GET_ALL_AUTHORS } from '../schemas/query';
 import Author from '../components/Author';
+import { useNavigation } from '@react-navigation/native';
+import Loader from '../components/Loader';
 
 const Authors = () => {
-
+    const navigation = useNavigation();
     const { loading, error, data } = useQuery(GET_ALL_AUTHORS);
 
-    if (loading) return <Text>Loading...</Text>;
+    if (loading) return <Loader />;
     if (error) {
         console.log(error)
         return <Text>Error :</Text>;
@@ -18,7 +20,11 @@ const Authors = () => {
         <SafeAreaView style={styles.AndroidSafeArea}>
             < View style={styles.container} >
                 <View style={styles.addButtonContainer}>
-                    <TouchableOpacity style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.buttonContainer}
+                        onPress={() => {
+                            navigation.navigate('AddAuthor')
+                        }}
+                    >
                         <Text style={styles.buttonText}>
                             Add New Author
                         </Text>

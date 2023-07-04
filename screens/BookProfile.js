@@ -1,31 +1,33 @@
-import { View, Text, StyleSheet, Platform, SafeAreaView, Image, TouchableOpacity, FlatList } from 'react-native'
+import { View, Text, StyleSheet, Platform, SafeAreaView, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { GET_DETAILS_OF_BOOK } from '../schemas/query';
 import { useQuery } from '@apollo/client';
+import Loader from '../components/Loader';
+const AUTHOR_PROFILE_BANNER = "https://www.bootdey.com/image/900x400/00BFFF/000000";
+const AUTHOR_AVATAR = "https://cdn4.iconfinder.com/data/icons/bookstore-9/64/woman-girl-avatar-reading-student-education-book_store-512.png"
 
 const BookProfile = ({ route }) => {
     const navigation = useNavigation();
     const { id } = route.params;
     const { loading, error, data } = useQuery(GET_DETAILS_OF_BOOK(JSON.stringify(id)));
 
-    if (loading) return <Text>Loading...</Text>;
+    if (loading) return <Loader />;
     if (error) {
         console.log(error)
         return <Text>Error :</Text>;
     }
-    console.log(data)
     return (
         <SafeAreaView style={styles.AndroidSafeArea}>
             <View style={styles.container}>
                 <Image
-                    source={{ uri: 'https://www.bootdey.com/image/900x400/00BFFF/000000' }}
+                    source={{ uri: AUTHOR_PROFILE_BANNER }}
                     style={styles.coverImage}
                 />
                 <View style={styles.avatarContainer}>
                     <Image
-                        source={{ uri: 'https://cdn4.iconfinder.com/data/icons/bookstore-9/64/woman-girl-avatar-reading-student-education-book_store-512.png' }}
+                        source={{ uri: AUTHOR_AVATAR }}
                         style={styles.avatar}
                     />
                     <Text style={[styles.name, styles.textWithShadow]}>{data["book_book"][0]["name"]}</Text>

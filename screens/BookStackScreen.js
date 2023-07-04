@@ -1,6 +1,4 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Authors from "./Authors";
-import AuthorProfile from "./AuthorProfile";
 import Books from "./Books";
 import BookProfile from "./BookProfile";
 
