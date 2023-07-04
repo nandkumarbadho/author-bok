@@ -6,9 +6,10 @@ import { GET_ALL_AUTHORS, GET_ALL_BOOKS } from '../schemas/query';
 import Author from '../components/Author';
 import Book from '../components/Book';
 import Loader from '../components/Loader';
+import { useNavigation } from '@react-navigation/native';
 
 const Books = () => {
-
+    const navigation = useNavigation();
     const { loading, error, data } = useQuery(GET_ALL_BOOKS);
 
     if (loading) return <Loader />;
@@ -20,7 +21,11 @@ const Books = () => {
         <SafeAreaView style={styles.AndroidSafeArea}>
             < View style={styles.container} >
                 <View style={styles.addButtonContainer}>
-                    <TouchableOpacity style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.buttonContainer}
+                        onPress={() => {
+                            navigation.navigate('AddBook')
+                        }}
+                    >
                         <Text style={styles.buttonText}>
                             Add New Book
                         </Text>
