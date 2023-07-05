@@ -2,7 +2,7 @@ import { useQuery, gql } from '@apollo/client';
 
 const GET_ALL_AUTHORS = gql`
     query GET_ALL_AUTHORS {
-        author_author {
+        author_author (order_by: {created_at: desc}){
           id
           name
           Age
@@ -30,19 +30,30 @@ const GET_DETAILS_OF_AUTHOR = gql`
       }
   }
   `
-const GET_DETAILS_OF_BOOK = (id) => {
-  return gql`
-  query GET_BOOK_BY_ID {
-    book_book(where: {id: {_eq: ${id}}}) {
+const GET_DETAILS_OF_BOOK = gql`    
+  query GET_BOOK_BY_ID($id: String!){
+    book_book(where: {id: {_eq: $id}}) {
       name
       author {
         id
         name
       }
-    }
+      }
   }
   `
-}
+// const GET_DETAILS_OF_BOOK = (id) => {
+//   return gql`
+//   query GET_BOOK_BY_ID {
+//     book_book(where: {id: {_eq: ${id}}}) {
+//       name
+//       author {
+//         id
+//         name
+//       }
+//     }
+//   }
+//   `
+// }
 
 
 export {

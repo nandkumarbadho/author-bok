@@ -15,8 +15,18 @@ const ADD_BOOK = gql`
   }
 `;
 
+const UPDATE_BOOK = gql`
+mutation UpdateBook($id: String!, $name: String) {
+  update_book_book_by_pk(
+    pk_columns: { id: $id },
+    _set: { name: $name}
+  ) {
+    name
+  }
+}`
 
 export {
-    ADD_AUTHOR,
-    ADD_BOOK
+  ADD_AUTHOR,
+  ADD_BOOK,
+  UPDATE_BOOK
 }
