@@ -5,12 +5,22 @@ import { ADD_AUTHOR } from '../schemas/mutation';
 import { useMutation } from '@apollo/client';
 import Loader from '../components/Loader';
 import { MaterialIcons } from '@expo/vector-icons';
+import { GET_ALL_AUTHORS, GET_ALL_BOOKS } from '../schemas/query';
+import ErrorScreen from '../components/ErrorScreen';
 const AddAuthor = ({ setModalVisible }) => {
     const [name, setName] = useState('');
     const [age, setAge] = useState('');
     const [books, setBooks] = useState([]);
     const [bookInput, setBookInput] = useState('');
-    const [addAuthor, { data, loading, error }] = useMutation(ADD_AUTHOR);
+    const [addAuthor, { data, loading, error }] = useMutation(ADD_AUTHOR, {
+        onCompleted: () => {
+            setModalVisible(false);
+
+        },
+        refetchQueries: [
+            GET_ALL_AUTHORS,
+        ],
+    });
     const handleAddBook = () => {
         if (bookInput.trim()) {
             setBooks([...books, { name: bookInput }]);
@@ -40,10 +50,9 @@ const AddAuthor = ({ setModalVisible }) => {
                 object: authorObj
             }
         });
-        setModalVisible(false);
-        console.log(data)
     }
     if (loading) return <Loader />
+    if (error) return <ErrorScreen />
 
     const renderBooks = () => {
         return books.map((book, index) => (

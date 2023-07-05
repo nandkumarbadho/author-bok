@@ -1,16 +1,50 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, SafeAreaView, Modal, Alert } from 'react-native';
-import { ADD_BOOK } from '../schemas/mutation';
+import { ADD_BOOK, UPDATE_BOOK } from '../schemas/mutation';
 import { useMutation } from '@apollo/client';
 import Loader from '../components/Loader';
 import { MaterialIcons } from '@expo/vector-icons';
+import { GET_ALL_BOOKS, GET_DETAILS_OF_AUTHOR, GET_DETAILS_OF_BOOK } from '../schemas/query';
+import ErrorScreen from '../components/ErrorScreen';
 
-const AddBook = ({ setModalVisible }) => {
-    const [name, setName] = useState('');
+const AddBook = ({ setModalVisible, id, prevName = "", isEdit = false }) => {
+    const [name, setName] = useState(prevName);
     const [authorId, setAuthorId] = useState('');
-    const [addBook, { data, loading, error }] = useMutation(ADD_BOOK);
+    const [addBook, { data, loading, error }] = useMutation(ADD_BOOK, {
+        onCompleted: () => {
+            setModalVisible(false);
+        },
+        refetchQueries: [
+            GET_DETAILS_OF_AUTHOR,
+            GET_ALL_BOOKS
+        ],
+    });
+    const [updateBook, { data: updateData, loading: updateLoading, error: updateError }] = useMutation(UPDATE_BOOK, {
+        onCompleted: () => {
+            setModalVisible(false);
+        },
+        refetchQueries: [
+            GET_ALL_BOOKS,
+            GET_DETAILS_OF_BOOK
+        ],
+    });
 
+    const handleUpdateBook = () => {
+        if (name.trim().length === 0) {
+            return Alert.alert("Name cannot be Empty")
+        }
+        if (name === prevName) {
+            setModalVisible(false);
+            return;
+        }
+        updateBook({
+            variables: {
+                id: id,
+                name: name
+            }
+        })
+    }
 
     const handleAddBook = () => {
         if (name.trim().length == 0 || authorId.trim().length === 0) {
@@ -27,10 +61,10 @@ const AddBook = ({ setModalVisible }) => {
                 object: bookObj
             }
         });
-        setModalVisible(false);
     }
     if (loading) return <Loader />
-
+    if (updateLoading) return <Loader />
+    if (error || updateError) return <ErrorScreen />;
     return (
         <SafeAreaView style={styles.AndroidSafeArea}>
             <View style={styles.container}>
@@ -47,18 +81,32 @@ const AddBook = ({ setModalVisible }) => {
                     placeholder="Enter name"
                 />
 
-                <Text style={styles.label}>Author's Id:</Text>
-                <TextInput
-                    style={styles.input}
-                    value={authorId}
-                    onChangeText={setAuthorId}
-                    placeholder="Enter AuthorId"
-                />
-                <View style={styles.addButtonContainer}>
+                {!isEdit
+                    &&
+                    <View>
+                        <Text style={styles.label}>Author's Id:</Text>
+                        <TextInput
+                            style={styles.input}
+                            value={authorId}
+                            onChangeText={setAuthorId}
+                            placeholder="Enter AuthorId"
+                        />
+                    </View>
+                }
 
-                    <TouchableOpacity style={styles.buttonContainer} onPress={handleAddBook}>
-                        <Text style={styles.buttonText}>Add Book</Text>
-                    </TouchableOpacity>
+                <View style={styles.addButtonContainer}>
+                    {isEdit ?
+
+                        <TouchableOpacity style={styles.buttonContainer} onPress={handleUpdateBook}>
+                            <Text style={styles.buttonText}>Update Book</Text>
+                        </TouchableOpacity>
+                        :
+
+                        <TouchableOpacity style={styles.buttonContainer} onPress={handleAddBook}>
+                            <Text style={styles.buttonText}>Add Book</Text>
+                        </TouchableOpacity>
+
+                    }
                 </View>
             </View>
         </SafeAreaView>

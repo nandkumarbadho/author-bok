@@ -1,22 +1,30 @@
-import { View, Text, StyleSheet, Platform, SafeAreaView, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet, Platform, SafeAreaView, Image, TouchableOpacity, FlatList, ActivityIndicator, Modal, Alert } from 'react-native'
+import React, { useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { GET_DETAILS_OF_BOOK } from '../schemas/query';
 import { useQuery } from '@apollo/client';
 import Loader from '../components/Loader';
+import AddBook from './AddBook';
+import ErrorScreen from '../components/ErrorScreen';
 const AUTHOR_PROFILE_BANNER = "https://www.bootdey.com/image/900x400/00BFFF/000000";
 const AUTHOR_AVATAR = "https://cdn4.iconfinder.com/data/icons/bookstore-9/64/woman-girl-avatar-reading-student-education-book_store-512.png"
 
 const BookProfile = ({ route }) => {
     const navigation = useNavigation();
     const { id } = route.params;
-    const { loading, error, data } = useQuery(GET_DETAILS_OF_BOOK(JSON.stringify(id)));
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const { loading, error, data } = useQuery(GET_DETAILS_OF_BOOK, {
+        variables: {
+            id: id
+        }
+    });
 
     if (loading) return <Loader />;
     if (error) {
         console.log(error)
-        return <Text>Error :</Text>;
+        return <ErrorScreen />;
     }
     return (
         <SafeAreaView style={styles.AndroidSafeArea}>
@@ -49,12 +57,27 @@ const BookProfile = ({ route }) => {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.addButtonContainer}>
-                        <TouchableOpacity style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.buttonContainer}
+                            onPress={() => setModalVisible(true)}
+                        >
                             <Text style={styles.buttonText}>
                                 Edit Book
                             </Text>
                         </TouchableOpacity>
                     </View>
+                </View>
+                <View style={styles.centeredView}>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => {
+                            Alert.alert('Modal has been closed.');
+                            setModalVisible(!modalVisible);
+                        }}
+                    >
+                        <AddBook prevName={data["book_book"][0]["name"]} id={id} setModalVisible={setModalVisible} isEdit={true} />
+                    </Modal>
                 </View>
             </View>
         </SafeAreaView>

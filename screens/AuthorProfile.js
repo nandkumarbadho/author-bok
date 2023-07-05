@@ -1,16 +1,16 @@
-import { View, Text, StyleSheet, Platform, SafeAreaView, Image, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet, Platform, SafeAreaView, Image, TouchableOpacity, FlatList, ActivityIndicator, Modal } from 'react-native'
+import React, { useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
-import { useNavigation } from '@react-navigation/native';
 import { GET_DETAILS_OF_AUTHOR } from '../schemas/query';
 import { useQuery } from '@apollo/client';
 import Book from '../components/Book';
 import Loader from '../components/Loader';
+import AddBook from './AddBook';
+import ErrorScreen from '../components/ErrorScreen';
 
 const AuthorProfile = ({ route }) => {
-    const navigation = useNavigation();
     const { id } = route.params;
-    console.log(id);
+    const [modalVisible, setModalVisible] = useState(false);
     const { loading, error, data } = useQuery(GET_DETAILS_OF_AUTHOR, {
         variables: {
             id: id
@@ -20,7 +20,7 @@ const AuthorProfile = ({ route }) => {
     if (loading) return <Loader />;
     if (error) {
         console.log(error)
-        return <Text>Error :</Text>;
+        return <ErrorScreen />;
     }
     return (
         <SafeAreaView style={styles.AndroidSafeArea}>
@@ -37,7 +37,7 @@ const AuthorProfile = ({ route }) => {
                     <Text style={[styles.name, styles.textWithShadow]}>{data["author_author"][0]["name"]}</Text>
                 </View>
                 <View style={styles.addButtonContainer}>
-                    <TouchableOpacity style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.buttonContainer} onPress={() => setModalVisible(true)}>
                         <Text style={styles.buttonText}>
                             Add Book
                         </Text>
@@ -53,6 +53,19 @@ const AuthorProfile = ({ route }) => {
                         keyExtractor={(item) => item.id}
                         numColumns={2}
                     />
+                </View>
+                <View style={styles.centeredView}>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => {
+                            Alert.alert('Modal has been closed.');
+                            setModalVisible(!modalVisible);
+                        }}
+                    >
+                        <AddBook setModalVisible={setModalVisible} />
+                    </Modal>
                 </View>
 
             </View>
