@@ -4,8 +4,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, SafeArea
 import { ADD_AUTHOR } from '../schemas/mutation';
 import { useMutation } from '@apollo/client';
 import Loader from '../components/Loader';
-
-const AddAuthor = () => {
+import { MaterialIcons } from '@expo/vector-icons';
+const AddAuthor = ({ setModalVisible }) => {
     const [name, setName] = useState('');
     const [age, setAge] = useState('');
     const [books, setBooks] = useState([]);
@@ -40,13 +40,14 @@ const AddAuthor = () => {
                 object: authorObj
             }
         });
+        setModalVisible(false);
         console.log(data)
     }
     if (loading) return <Loader />
 
     const renderBooks = () => {
         return books.map((book, index) => (
-            <View key={index} style={styles.bookContainer}>
+            <View key={index} style={styles.bookContainerText}>
                 <Text style={styles.book}>{book.name}</Text>
                 <TouchableOpacity
                     style={styles.deleteButton}
@@ -61,6 +62,11 @@ const AddAuthor = () => {
     return (
         <SafeAreaView style={styles.AndroidSafeArea}>
             <View style={styles.container}>
+                <TouchableOpacity
+                    onPress={() => setModalVisible(false)}
+                    style={styles.cancelIcon}>
+                    <MaterialIcons name="cancel" size={35} color="#00BFFF" />
+                </TouchableOpacity>
                 <Text style={styles.label}>Author's Name:</Text>
                 <TextInput
                     style={styles.input}
@@ -89,13 +95,16 @@ const AddAuthor = () => {
                             placeholder="Enter book"
                         />
                         <TouchableOpacity style={styles.addButton} onPress={handleAddBook}>
-                            <Text style={styles.addButtonText}>+</Text>
+                            <Text style={styles.addButtonText}>Add</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
-                <TouchableOpacity onPress={handleAddAuthor}>
-                    <Text>Add Author</Text>
-                </TouchableOpacity>
+                <View style={styles.addButtonContainer}>
+
+                    <TouchableOpacity style={styles.buttonContainer} onPress={handleAddAuthor}>
+                        <Text style={styles.buttonText}>Add Author</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </SafeAreaView>
 
@@ -109,9 +118,15 @@ const styles = StyleSheet.create({
         paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     },
     container: {
-        justifyContent:'center',
+        justifyContent: 'center',
         flex: 1,
         padding: 20,
+    },
+    cancelIcon: {
+        position: 'absolute',
+        top: 5,
+        left: 5
+
     },
     label: {
         fontSize: 16,
@@ -125,11 +140,17 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingHorizontal: 10,
     },
+
     bookContainer: {
         marginBottom: 10,
     },
+    bookContainerText: {
+        marginBottom: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
     book: {
-        fontSize: 16,
+        fontSize: 20,
         marginBottom: 5,
     },
     bookInputContainer: {
@@ -146,11 +167,9 @@ const styles = StyleSheet.create({
     },
     addButton: {
         backgroundColor: 'green',
-        borderRadius: 15,
-        width: 30,
-        height: 30,
-        justifyContent: 'center',
-        alignItems: 'center',
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
     },
     addButtonText: {
         color: 'white',
@@ -167,6 +186,27 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
+    addButtonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 20,
+    }, title: {
+        fontSize: 30
+    },
+    buttonContainer: {
+        height: 50,
+        width: 200,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 30,
+        backgroundColor: '#00BFFF',
+    },
+    buttonText: {
+        color: '#FFFFFF',
+        fontSize: 20,
+    }
 });
 
 export default AddAuthor;

@@ -1,15 +1,17 @@
-import React from 'react';
-import { ActivityIndicator, FlatList, Platform, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, FlatList, Modal, Platform, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import { View, StyleSheet, Text } from 'react-native';
 import { useQuery } from '@apollo/client';
 import { GET_ALL_AUTHORS } from '../schemas/query';
 import Author from '../components/Author';
 import { useNavigation } from '@react-navigation/native';
 import Loader from '../components/Loader';
+import AddAuthor from './AddAuthor';
 
 const Authors = () => {
     const navigation = useNavigation();
     const { loading, error, data } = useQuery(GET_ALL_AUTHORS);
+    const [modalVisible, setModalVisible] = useState(false);
 
     if (loading) return <Loader />;
     if (error) {
@@ -22,7 +24,8 @@ const Authors = () => {
                 <View style={styles.addButtonContainer}>
                     <TouchableOpacity style={styles.buttonContainer}
                         onPress={() => {
-                            navigation.navigate('AddAuthor')
+                            setModalVisible(true)
+                            // navigation.navigate('AddAuthor')
                         }}
                     >
                         <Text style={styles.buttonText}>
@@ -36,7 +39,7 @@ const Authors = () => {
                         borderBottomWidth: StyleSheet.hairlineWidth,
                     }}
                 />
-                <View syle={styles.listContainer}>
+                <View style={styles.listContainer}>
                     <FlatList
                         showsVerticalScrollIndicator={false}
                         data={data["author_author"]}
@@ -44,6 +47,20 @@ const Authors = () => {
                         keyExtractor={item => item.id}
                     />
                 </View>
+                <View style={styles.centeredView}>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => {
+                            Alert.alert('Modal has been closed.');
+                            setModalVisible(!modalVisible);
+                        }}
+                    >
+                        <AddAuthor setModalVisible={setModalVisible} />
+                    </Modal>
+                </View>
+
             </View >
         </SafeAreaView>
 
@@ -56,20 +73,27 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     },
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
     container: {
         flex: 1,
         padding: 5,
         backgroundColor: 'white'
     },
     listContainer: {
-        marginVertical: 10
+        paddingBottom: 80
     },
     addButtonContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 20,
-    }, title: {
+    },
+    title: {
         fontSize: 30
     },
     buttonContainer: {
