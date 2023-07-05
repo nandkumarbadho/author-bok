@@ -1,15 +1,13 @@
-import React from 'react';
-import { FlatList, Platform, Pressable, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, FlatList, Modal, Platform, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import { View, StyleSheet, Text } from 'react-native';
-import { useQuery, gql } from '@apollo/client';
-import { GET_ALL_AUTHORS, GET_ALL_BOOKS } from '../schemas/query';
-import Author from '../components/Author';
+import { useQuery } from '@apollo/client';
+import { GET_ALL_BOOKS } from '../schemas/query';
 import Book from '../components/Book';
 import Loader from '../components/Loader';
-import { useNavigation } from '@react-navigation/native';
-
+import AddBook from './AddBook'
 const Books = () => {
-    const navigation = useNavigation();
+    const [modalVisible, setModalVisible] = useState(false);
     const { loading, error, data } = useQuery(GET_ALL_BOOKS);
 
     if (loading) return <Loader />;
@@ -23,7 +21,7 @@ const Books = () => {
                 <View style={styles.addButtonContainer}>
                     <TouchableOpacity style={styles.buttonContainer}
                         onPress={() => {
-                            navigation.navigate('AddBook')
+                            setModalVisible(true);
                         }}
                     >
                         <Text style={styles.buttonText}>
@@ -45,6 +43,19 @@ const Books = () => {
                         keyExtractor={item => item.id}
                         numColumns={2}
                     />
+                </View>
+                <View style={styles.centeredView}>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => {
+                            Alert.alert('Modal has been closed.');
+                            setModalVisible(!modalVisible);
+                        }}
+                    >
+                        <AddBook setModalVisible={setModalVisible} />
+                    </Modal>
                 </View>
             </View >
         </SafeAreaView>
