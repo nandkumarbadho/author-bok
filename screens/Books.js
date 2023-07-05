@@ -6,14 +6,14 @@ import { GET_ALL_BOOKS } from '../schemas/query';
 import Book from '../components/Book';
 import Loader from '../components/Loader';
 import AddBook from './AddBook'
+import ErrorScreen from '../components/ErrorScreen';
 const Books = () => {
     const [modalVisible, setModalVisible] = useState(false);
-    const { loading, error, data } = useQuery(GET_ALL_BOOKS);
+    const { loading, error, data, refetch } = useQuery(GET_ALL_BOOKS);
 
     if (loading) return <Loader />;
     if (error) {
-        console.log(error)
-        return <Text>Error :</Text>;
+        return <ErrorScreen />;
     }
     return (
         <SafeAreaView style={styles.AndroidSafeArea}>
@@ -54,7 +54,7 @@ const Books = () => {
                             setModalVisible(!modalVisible);
                         }}
                     >
-                        <AddBook setModalVisible={setModalVisible} />
+                        <AddBook setModalVisible={setModalVisible} refetch={refetch} />
                     </Modal>
                 </View>
             </View >

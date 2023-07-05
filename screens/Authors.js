@@ -7,6 +7,7 @@ import Author from '../components/Author';
 import { useNavigation } from '@react-navigation/native';
 import Loader from '../components/Loader';
 import AddAuthor from './AddAuthor';
+import ErrorScreen from '../components/ErrorScreen';
 
 const Authors = () => {
     const navigation = useNavigation();
@@ -16,7 +17,7 @@ const Authors = () => {
     if (loading) return <Loader />;
     if (error) {
         console.log(error)
-        return <Text>Error :</Text>;
+        return <ErrorScreen />;
     }
     return (
         <SafeAreaView style={styles.AndroidSafeArea}>
