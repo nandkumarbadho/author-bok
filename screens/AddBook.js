@@ -62,8 +62,7 @@ const AddBook = ({ setModalVisible, id, prevName = "", isEdit = false }) => {
             }
         });
     }
-    if (loading) return <Loader />
-    if (updateLoading) return <Loader />
+    if (loading || updateLoading) return <Loader />
     if (error || updateError) return <ErrorScreen />;
     return (
         <SafeAreaView style={styles.AndroidSafeArea}>

@@ -2,11 +2,12 @@ import { View, Text, StyleSheet, Platform, SafeAreaView, Image, TouchableOpacity
 import React, { useState } from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
-import { GET_DETAILS_OF_BOOK } from '../schemas/query';
-import { useQuery } from '@apollo/client';
+import { GET_ALL_BOOKS, GET_DETAILS_OF_AUTHOR, GET_DETAILS_OF_BOOK } from '../schemas/query';
+import { useMutation, useQuery } from '@apollo/client';
 import Loader from '../components/Loader';
 import AddBook from './AddBook';
 import ErrorScreen from '../components/ErrorScreen';
+import { DELETE_BOOK } from '../schemas/mutation';
 const AUTHOR_PROFILE_BANNER = "https://www.bootdey.com/image/900x400/00BFFF/000000";
 const AUTHOR_AVATAR = "https://cdn4.iconfinder.com/data/icons/bookstore-9/64/woman-girl-avatar-reading-student-education-book_store-512.png"
 
@@ -20,9 +21,23 @@ const BookProfile = ({ route }) => {
             id: id
         }
     });
+    const [deleteBook, { data: deleteData, loading: deleteLoading, error: deleteError }] = useMutation(DELETE_BOOK, {
+        onCompleted: () => {
+            navigation.goBack();
+        },
+        refetchQueries:[GET_ALL_BOOKS,GET_DETAILS_OF_AUTHOR]
+    });
 
-    if (loading) return <Loader />;
-    if (error) {
+    const handleDeleteBook = (id) => {
+        deleteBook({
+            variables: {
+                id: id
+            }
+        })
+    }
+
+    if (loading | deleteLoading) return <Loader />;
+    if (error || deleteError) {
         console.log(error)
         return <ErrorScreen />;
     }
@@ -62,6 +77,13 @@ const BookProfile = ({ route }) => {
                         >
                             <Text style={styles.buttonText}>
                                 Edit Book
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.buttonContainer}
+                            onPress={() => handleDeleteBook(id)}
+                        >
+                            <Text style={styles.buttonText}>
+                                Delete Book
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -120,7 +142,6 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     addButtonContainer: {
-        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 20
@@ -133,6 +154,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 30,
         backgroundColor: '#00BFFF',
+        marginVertical:10
     },
     buttonText: {
         color: '#FFFFFF',

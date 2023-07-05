@@ -24,9 +24,19 @@ mutation UpdateBook($id: String!, $name: String) {
     name
   }
 }`
+const DELETE_BOOK = gql`
+mutation DELETE_BOOK($id: String = null) {
+  delete_book_book(where: {id: {_eq: $id}}){
+    affected_rows
+  }
+}
+`
+
+
 
 export {
   ADD_AUTHOR,
   ADD_BOOK,
-  UPDATE_BOOK
+  UPDATE_BOOK,
+  DELETE_BOOK
 }
