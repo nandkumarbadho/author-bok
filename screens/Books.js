@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, FlatList, Modal, Platform, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import { Alert, Dimensions, FlatList, Modal, Platform, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import { View, StyleSheet, Text } from 'react-native';
 import { useQuery } from '@apollo/client';
 import { GET_ALL_BOOKS } from '../schemas/query';
@@ -7,6 +7,7 @@ import Book from '../components/Book';
 import Loader from '../components/Loader';
 import AddBook from './AddBook'
 import ErrorScreen from '../components/ErrorScreen';
+import { FlashList } from "@shopify/flash-list";
 const Books = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const { loading, error, data, refetch } = useQuery(GET_ALL_BOOKS);
@@ -29,20 +30,12 @@ const Books = () => {
                         </Text>
                     </TouchableOpacity>
                 </View>
-                <View
-                    style={{
-                        borderBottomColor: 'black',
-                        borderBottomWidth: StyleSheet.hairlineWidth,
-                    }}
-                />
-                <View syle={styles.listContainer}>
-                    <FlatList
-                        showsVerticalScrollIndicator={false}
+                <View style={styles.listContainer}>
+                    {data["book_book"] && <FlashList
                         data={data["book_book"]}
-                        renderItem={({ item }) => (<Book book={item} />)}
-                        keyExtractor={item => item.id}
-                        numColumns={2}
-                    />
+                        renderItem={({ item }) => <Book book={item} />}
+                        estimatedItemSize={180}
+                    />}
                 </View>
                 <View style={styles.centeredView}>
                     <Modal
@@ -76,15 +69,25 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         paddingBottom: 70,
     },
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
     listContainer: {
+        height:600,
+        width: Dimensions.get("screen").width,
         marginVertical: 10,
+
     },
     addButtonContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 20,
-    }, title: {
+    },
+    title: {
         fontSize: 30
     },
     buttonContainer: {
