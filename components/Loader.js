@@ -12,6 +12,7 @@ const styles = StyleSheet.create({
     loaderContainer: {
         flex: 1,
         alignItems: 'center',
+        backgroundColor:'#ffffff',
         justifyContent: 'center',
     }
 })
