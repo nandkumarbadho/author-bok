@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Dimensions, FlatList, Modal, Platform, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, FlatList, Modal, Platform, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import { View, StyleSheet, Text } from 'react-native';
 import { useQuery } from '@apollo/client';
 import { GET_ALL_BOOKS } from '../schemas/query';
@@ -10,8 +10,37 @@ import ErrorScreen from '../components/ErrorScreen';
 import { FlashList } from "@shopify/flash-list";
 const Books = () => {
     const [modalVisible, setModalVisible] = useState(false);
-    const { loading, error, data, refetch } = useQuery(GET_ALL_BOOKS);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const { loading, error, data, refetch, fetchMore } = useQuery(GET_ALL_BOOKS, {
+        variables: {
+            limit: 5,
+            offset: 0
+        }
+    });
 
+
+    function fetchMoreBooks() {
+        setIsLoadingMore(true);
+        fetchMore({
+            variables: {
+                offset: data["book_book"].length,
+            },
+            updateQuery: (prev, { fetchMoreResult }) => {
+                if (!fetchMoreResult) {
+                    setIsLoadingMore(false);
+                    return prev;
+                }
+                setIsLoadingMore(false);
+                return {
+                    ...prev,
+                    book_book: [
+                        ...prev.book_book,
+                        ...fetchMoreResult.book_book,
+                    ],
+                };
+            },
+        });
+    }
     if (loading) return <Loader />;
     if (error) {
         return <ErrorScreen />;
@@ -35,6 +64,13 @@ const Books = () => {
                         data={data["book_book"]}
                         renderItem={({ item }) => <Book book={item} />}
                         estimatedItemSize={180}
+                        onEndReached={fetchMoreBooks}
+                        onEndReachedThreshold={0.8}
+                        ListFooterComponent={
+                            isLoadingMore ? (
+                                <ActivityIndicator size="large" color="#00BFFF" />
+                            ) : null
+                        }
                     />}
                 </View>
                 <View style={styles.centeredView}>
@@ -76,7 +112,7 @@ const styles = StyleSheet.create({
         marginTop: 22,
     },
     listContainer: {
-        height:600,
+        height: 600,
         width: Dimensions.get("screen").width,
         marginVertical: 10,
 
