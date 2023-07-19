@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ActivityIndicator, Alert, Dimensions, FlatList, Modal, Platform, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { ActivityIndicator, Alert, Dimensions, FlatList, Modal, Platform, RefreshControl, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import { View, StyleSheet, Text } from 'react-native';
 import { useQuery } from '@apollo/client';
 import { GET_ALL_BOOKS } from '../schemas/query';
@@ -11,12 +11,19 @@ import { FlashList } from "@shopify/flash-list";
 const Books = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const { loading, error, data, refetch, fetchMore } = useQuery(GET_ALL_BOOKS, {
         variables: {
             limit: 5,
             offset: 0
         }
     });
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        refetch();
+        setRefreshing(false);
+    };
 
 
     function fetchMoreBooks() {
@@ -70,6 +77,9 @@ const Books = () => {
                             isLoadingMore ? (
                                 <ActivityIndicator size="large" color="#00BFFF" />
                             ) : null
+                        }
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                         }
                     />}
                 </View>

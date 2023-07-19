@@ -11,7 +11,7 @@ const GET_ALL_AUTHORS = gql`
 `;
 const GET_ALL_BOOKS = gql`
     query GET_ALL_BOOKS ($limit: Int = 5, $offset: Int = 0) {
-      book_book(limit: $limit, offset: $offset){
+      book_book(limit: $limit, offset: $offset,order_by: {id: asc}){
         id 
         name
       }
